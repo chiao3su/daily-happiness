@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>不簡單的日常幸福</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Lexend:wght@500;700&display=swap" rel="stylesheet">
+<style>
+/* VOICE: the exhibition poster's voice: bold, printed, urgent, then relieved
+   IDEA: a 1920x1080 screen printed like the main visual; red redaction bars mean "forbidden", teal ink means "won back"
+   PICTURE: feed cards on the home poster; full-bleed scene, monochrome under censorship, full colour once opened
+   COLOUR and TYPE: cream #f4eadb, vermilion #f2463e, teal #0f9473; Noto Sans TC 900 headlines, Lexend numerals
+   LAYOUT: fixed canvas scaled to fit; text printed straight onto the paper margins */
+@property --r{syntax:'<percentage>';inherits:false;initial-value:0%}
+:root{color-scheme:light;--paper:#f4eadb;--red:#f2463e;--red-d:#cf3630;--teal:#0f9473;--teal-d:#0b765c;--ink:#22201c;--soft:#6e6356}
+*{box-sizing:border-box;min-width:0}
+html,body{margin:0;height:100%;background:#14110e;overflow:hidden}
+body{font:20px/1.6 "Noto Sans TC",system-ui,sans-serif;color:var(--ink)}
+#app{position:absolute;left:50%;top:50%;width:1920px;height:1080px;transform:translate(-50%,-50%) scale(var(--s,1));background:var(--paper);overflow:hidden;user-select:none}
+.view{position:absolute;inset:0}
+.view[hidden]{display:none}
+button{font-family:inherit}
+.dots{height:4px;background:radial-gradient(circle,var(--teal) 1.6px,transparent 2px) 0 50%/8px 4px repeat-x}
+
+/* ---------- home ---------- */
+#home .bars{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+#home .inner{position:relative;display:flex;flex-direction:column;align-items:center;padding:44px 120px 0;text-align:center}
+#home h1{font:900 92px/1 "Noto Sans TC",sans-serif;margin:0;color:var(--red);letter-spacing:.06em;filter:url(#rough)}
+#home .lead{color:var(--teal);margin:16px 0 0;font-size:25px;font-weight:700;letter-spacing:.04em}
+#home .lead+.dots{width:760px;margin-top:14px}
+.roles{display:grid;grid-template-columns:repeat(3,520px);gap:40px;margin:30px 0 0;padding:0;list-style:none;text-align:start}
+.role{display:flex;flex-direction:column;gap:16px}
+.post{position:relative;display:block;cursor:pointer;background:#fff;color:#111;border-radius:20px;padding:18px 24px 12px;flex:1;
+  box-shadow:0 1px 2px rgba(0,0,0,.06),0 16px 30px -20px rgba(60,40,20,.45);outline:5px solid transparent;outline-offset:5px;
+  transition:transform .25s,box-shadow .25s,outline-color .2s,opacity .3s}
+.post:focus-visible{outline-color:var(--red)}
+.post[aria-checked=true]{outline-color:var(--teal);transform:translateY(-6px)}
+.post[aria-checked=true]::after{content:"✓";position:absolute;top:-18px;right:-18px;width:46px;height:46px;border-radius:50%;background:var(--teal);color:#fff;font:900 26px/46px "Noto Sans TC";text-align:center}
+.roles.picked .post[aria-checked=false]{opacity:.45}
+.brand{display:block;border-bottom:1px solid #e6e6e6;padding-bottom:11px;margin-bottom:13px}
+.brand img{height:28px;width:auto;display:block}
+.who{display:flex;align-items:center;gap:14px;margin-bottom:10px}
+.who img{width:56px;height:56px;border-radius:50%;object-fit:cover;flex:none}
+.who b{font-weight:700;font-size:20px}
+.who span{color:#999;font-size:16px}
+.who .more{margin-inline-start:auto;color:#333;letter-spacing:2px}
+.post p{margin:0 0 .55em;font-size:18.5px;line-height:1.66;color:#1a1a1a}
+.stats{display:flex;justify-content:space-between;border-top:1px solid #e6e6e6;margin-top:10px;padding-top:10px;color:#333;font-size:17px}
+.stats span{display:flex;align-items:center;gap:7px}
+.stats svg{width:21px;height:21px;fill:none;stroke:#222;stroke-width:1.8}
+.free{list-style:none;margin:0;padding:0 4px;display:flex;flex-direction:column;gap:2px;font-size:21px;font-weight:700;color:var(--teal-d);min-height:134px;
+  opacity:0;transform:translateY(-8px);visibility:hidden;transition:opacity .4s,transform .4s,visibility 0s .4s}
+.role:has(.post[aria-checked=true]) .free{opacity:1;transform:none;visibility:visible;transition:opacity .4s,transform .4s}
+.free li::before{content:"✓";display:inline-block;width:1.3em;color:var(--teal);font-weight:900}
+.go{position:absolute;left:0;right:0;bottom:40px;display:flex;flex-direction:column;align-items:center;gap:12px}
+.cross{font:900 32px "Noto Sans TC",sans-serif;letter-spacing:.12em;height:84px;padding:0 90px;border:0;background:var(--red);color:#fff8ec;cursor:pointer;
+  clip-path:polygon(28px 0,100% 0,calc(100% - 28px) 100%,0 100%);transition:filter .2s,transform .2s,opacity .2s}
+.cross:active:not(:disabled){transform:scale(.98)}
+.cross:disabled{opacity:.3;cursor:not-allowed}
+.cross:focus-visible{outline:4px solid var(--teal);outline-offset:6px}
+.go p{margin:0;color:var(--teal-d);font-size:21px;font-weight:500}
+
+/* ---------- scene ---------- */
+.stage{position:absolute;inset:0;container-type:inline-size;background:var(--paper)}
+.stage>img{position:absolute;inset:0;width:100%;height:100%;display:block}
+.past{position:absolute;background-repeat:no-repeat;pointer-events:none;
+  -webkit-mask:radial-gradient(circle at var(--x,50%) var(--y,50%),#000 var(--r),transparent calc(var(--r) + 14%)),radial-gradient(farthest-corner,#000 76%,transparent 100%);
+  -webkit-mask-composite:source-in;
+  mask:radial-gradient(circle at var(--x,50%) var(--y,50%),#000 var(--r),transparent calc(var(--r) + 14%)),radial-gradient(farthest-corner,#000 76%,transparent 100%);
+  mask-composite:intersect;--r:-15%;transition:--r 1.2s cubic-bezier(.4,0,.2,1)}
+.past.on{--r:150%}
+.past.full{inset:0;background-size:100% 100%;
+  -webkit-mask:radial-gradient(circle at var(--x,50%) var(--y,50%),#000 var(--r),transparent calc(var(--r) + 14%)),var(--m) 0 0/100% 100% no-repeat;-webkit-mask-composite:source-in;
+  mask:radial-gradient(circle at var(--x,50%) var(--y,50%),#000 var(--r),transparent calc(var(--r) + 14%)),var(--m) 0 0/100% 100% no-repeat;mask-composite:intersect}
+.hot{position:absolute;border:0;background:transparent;cursor:pointer;padding:0;border-radius:40%}
+.hot:focus-visible{outline:4px solid var(--red);outline-offset:-8px}
+.tag{position:absolute;display:flex;align-items:center;gap:10px;padding:11px 22px 11px 16px;background:var(--teal);color:#fff8ec;
+  font:700 21px/1 "Noto Sans TC",sans-serif;pointer-events:none;transition:opacity .4s;clip-path:polygon(10px 0,100% 0,calc(100% - 10px) 100%,0 100%)}
+.tag i{width:14px;height:14px;border-radius:50%;background:#fff8ec;animation:blink 1.6s infinite}
+.hot[aria-pressed=true]+.tag{opacity:0}
+.tag.back{background:#fff8ec;color:var(--red);box-shadow:inset 0 0 0 3px var(--red);opacity:0}
+.tag.back i{background:var(--red)}
+.hot[aria-pressed=true]+.tag+.tag.back{opacity:1;transition:opacity .4s .9s}
+@keyframes blink{50%{opacity:.25}}
+.panel{position:absolute;pointer-events:none}
+/* forbidden: red redaction strips */
+.ban{transition:opacity .45s,transform .45s}
+.ban.off{opacity:0;transform:translateX(-24px)}
+.ban h2{display:inline-block;margin:0 0 .55em;font:900 calc(var(--k,1)*2cqw)/1.15 "Noto Sans TC",sans-serif;color:var(--red);letter-spacing:.03em}
+.ban h2 small{display:block;font-size:.55em;font-weight:700;letter-spacing:.12em;color:var(--ink);opacity:.7;margin-bottom:.25em}
+.ban ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:calc(var(--k,1)*.6cqw)}
+.ban li{align-self:flex-start;display:flex;align-items:center;gap:.6em;font:700 calc(var(--k,1)*1.55cqw)/1.3 "Noto Sans TC",sans-serif;color:#fff8ec;background:var(--red);
+  padding:.42em 1.3em .42em 1.1em;clip-path:polygon(.55em 0,100% 0,calc(100% - .55em) 100%,0 100%)}
+.ban li::before{content:"✕";font-weight:900}
+.ban li:nth-child(2){margin-inline-start:.9em}.ban li:nth-child(3){margin-inline-start:1.8em}
+/* opened: teal ink */
+.won{opacity:0;transform:translateY(12px);transition:opacity .6s .55s,transform .6s .55s}
+.won.on{opacity:1;transform:none}
+.won h2{margin:0 0 .35em;font:900 calc(var(--k,1)*2cqw)/1.15 "Noto Sans TC",sans-serif;color:var(--teal);letter-spacing:.03em}
+.won h2 small{display:block;font-size:.55em;font-weight:700;letter-spacing:.12em;color:var(--ink);opacity:.7;margin-bottom:.25em}
+.item{display:grid;grid-template-columns:calc(var(--k,1)*8.6cqw) 1fr;gap:0 1.2em;align-items:start;padding:calc(var(--k,1)*.9cqw) 0 calc(var(--k,1)*.75cqw);
+  background:radial-gradient(circle,var(--teal) 1.5px,transparent 2px) 0 0/8px 4px repeat-x}
+.yr{position:relative;font:700 calc(var(--k,1)*3cqw)/1 "Lexend",sans-serif;color:var(--teal);white-space:nowrap;text-align:center;padding-top:.12em}
+.yr::after{content:"";position:absolute;left:-.12em;right:-.12em;top:-.22em;height:1.55em;border:2px solid var(--teal);border-radius:50%;transform:rotate(-7deg)}
+.yr.long{font-size:calc(var(--k,1)*2.35cqw)}
+.yr small{display:block;font:700 calc(var(--k,1)*.95cqw)/1.6 "Noto Sans TC",sans-serif;color:var(--teal-d);margin-top:.85em}
+.why{font-size:calc(var(--k,1)*1.15cqw);line-height:1.55;margin:0 0 .3em;color:var(--soft)}
+.why b{color:var(--red-d);font-weight:700}
+.now{font:700 calc(var(--k,1)*1.4cqw)/1.5 "Noto Sans TC",sans-serif;margin:0;color:var(--ink)}
+.ctrl{position:absolute;right:22px;top:14px;display:flex;gap:10px;z-index:3}
+.ctrl button{font:700 18px "Noto Sans TC",sans-serif;height:44px;padding:0 20px;border-radius:99px;border:2px solid var(--teal);background:rgba(244,234,219,.92);color:var(--teal-d);cursor:pointer}
+.ctrl button:focus-visible{outline:3px solid var(--red);outline-offset:2px}
+.wip{position:absolute;inset:0;display:grid;place-content:center;text-align:center;color:var(--soft);font-size:24px}
+.wip b{display:block;font:900 44px "Noto Sans TC",sans-serif;color:var(--red);margin-bottom:10px}
+
+/* ---------- red redaction wipe ---------- */
+.wipe{position:absolute;inset:0;pointer-events:none;z-index:9}
+.wipe span{position:absolute;top:0;bottom:0;width:560px;background:var(--red);clip-path:polygon(504px 0,100% 0,56px 100%,0 100%);
+  transform:translateX(-2600px);transition:transform .55s cubic-bezier(.6,0,.3,1)}
+.wipe.in span{transform:translateX(0)}
+.wipe.out span{transform:translateX(2600px)}
+.wipe.reset span{transition:none}
+.wipe span:nth-child(odd){background:var(--red-d)}
+@media (prefers-reduced-motion:reduce){.past,.ban,.won,.post,.wipe span{transition:none}.tag i{animation:none}}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><filter id="rough"><feTurbulence type="fractalNoise" baseFrequency="1.1" numOctaves="1" seed="3"/><feColorMatrix values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 -9 6.3"/><feComposite in="SourceGraphic" operator="in"/></filter></svg>
+<div id="app">
+  <section class="view" id="home">
+    <svg class="bars" viewBox="0 0 1920 1080" aria-hidden="true" id="bars"></svg>
+    <div class="inner">
+      <h1>不簡單的日常幸福</h1>
+      <p class="lead">今天再平凡不過的一則貼文，放回三十多年前，每一件事都可能被禁止。</p>
+      <div class="dots"></div>
+      <ul class="roles" id="roles" role="radiogroup" aria-label="選擇一個角色"></ul>
+    </div>
+    <div class="go">
+      <button class="cross" id="cross" type="button" disabled>穿越回戒嚴時期</button>
+      <p id="goHint">選擇一個角色後按下穿越鍵，帶你走一趟爭取開放的歷史</p>
+    </div>
+  </section>
+  <section class="view" id="scene" hidden></section>
+  <div class="wipe" id="wipe"><span style="left:-560px"></span><span style="left:-120px"></span><span style="left:320px"></span><span style="left:760px"></span><span style="left:1200px"></span><span style="left:1640px"></span></div>
+</div>
+<script>
+{
+const app=document.getElementById('app');
+const fit=()=>app.style.setProperty('--s',Math.min(innerWidth/1920,innerHeight/1080));
+addEventListener('resize',fit);fit();
+/* poster bars on home: slanted red strokes at both edges */
+const barDefs=[[-120,1080,70,330],[-10,1080,40,200],[70,1080,24,140],[1700,1080,60,520],[1800,1080,90,760],[1880,1080,34,980],[1610,1080,22,260]];
+document.getElementById('bars').innerHTML=barDefs.map(([x,y,w,h])=>{const dx=h*.42;return `<polygon fill="#f2463e" points="${x},${y} ${x+w},${y} ${x+w+dx},${y-h} ${x+dx},${y-h}"/>`}).join('');
+const roles=[
+  {id:'ayumom',name:'ayumom_daily',av:'av-ayumom.jpg',
+   post:['今天阿宇學校「母語日」，他上台用超輪轉的台語講笑話，把全班逗到快翻掉，還拿了一張小獎狀回來炫耀😂',
+         '剛剛去接他的時候，看他書包重得要命，一翻開裡面塞了三本剛從學校圖書館借的日本翻譯漫畫，嘴裡還一直碎念下個月全班要去外縣市兩天一夜畢業旅行要帶什麼零食⋯⋯',
+         '晚上帶他去同學家寫功課，同學媽媽剛好是政治評論員，客廳電視正大聲播著政論節目，大人小孩一邊吃晚餐一邊鬥嘴。看著他們這樣無憂無慮長大，真的覺得好幸福❤️'],
+   stats:['286','18','9','12'],
+   free:['使用母語的自由','百分百的言論自由','出版閱讀自由']},
+  {id:'mei',name:'mei_25.zip',av:'av-mei.jpg',
+   post:['救命剛剛在第四台跟滑手機同時看到高雄這週末演唱會的廣告，腦波一弱直接打電話給朋友，兩個人三分鐘內刷完高鐵票說明天就衝！！🚄🔥',
+         '下班先衝去文化中心廣場跟舞團練一波快閃，跳到一半旁邊路人還一起拍手超嗨哈哈哈哈～',
+         '想到週末可以在現場大聲唱那些超炸的歌完全不用管什麼限制，現在興奮到睡不著覺，高雄我來了！！🎤✨'],
+   stats:['1,528','126','87','203'],
+   free:['新聞與影視開放（報禁、第四台開放）','移動遷徙的自由','集會遊行的自由']},
+  {id:'zhiming',name:'zhiming_1981',av:'av-zhiming.jpg',
+   post:['剛下班在咖啡廳把這週新政策的長文評論發出去，留言區已經戰成一團了（歡迎理性討論，但人身攻擊我會直接封鎖喔🙂）。',
+         '晚點準備把筆電收一收，換雙好走的鞋去凱道參加今晚的公民集會，有些聲音還是要親自站出來表達才行。',
+         '對了，忙完這攤，週末終於要跟合法登記滿三年的另一半飛東京過結婚紀念日了✈️ 機票昨晚才臨時刷下去，謝謝我那位永遠陪我瘋的隊友，也謝謝這座島嶼讓我們能這樣自在相愛。'],
+   stats:['643','52','31','46'],
+   free:['網路使用與評論自由','出入境旅行自由','組黨結社的自由','婚姻平權']}
+];
+const scenes={
+  ayumom:{now:'ayu-now.jpg',then:'ayu-then.jpg',
+    alt:'戒嚴時期：電視與漫畫被禁，爸爸被軍警帶走，孩子低頭難過；教室裡男孩因講母語被掛上「禁說母語」木牌示眾。',
+    L:{place:'客廳',region:[0,0,51,60],ban:['不能公開評論政治，家人會連帶受懲罰','報章雜誌、外籍刊物都要送審'],hot:'left:1%;top:2%;width:48%;height:55%',tag:'left:3%;top:4%',panel:'left:54%;top:7%;width:42%;--k:.9',
+      items:[
+      {ago:'35 年前',year:'1991',why:'媽媽公開評論政治，爸爸也因此被警察抓走。',now:'1991 年廢除《違警罰法》後，警察才不能不經法院隨意拘留處罰人民。'},
+      {ago:'27 年前',year:'1999',why:'沒有送審的日本翻譯漫畫，會被認定影響學業、思想不當，遭查扣銷毀。',now:'1999 年起，出版書報雜誌才徹底免除向政府申請登記與查禁處分。'}]},
+    R:{place:'教室',region:[49,39,51,61],ban:['在學校不能說台語、客語、族語', '全班出外過夜，要向派出所申報'],hot:'left:50%;top:41%;width:48%;height:55%',tag:'right:3%;bottom:5%',panel:'left:3%;top:61%;width:43%;--k:.9',
+      items:[
+      {ago:'33 年前',year:'1993',why:'在學校講台語、客語或族語，要罰錢、罰站，還要在脖子上掛木牌示眾。',now:'1993 年，教育部才正式通令全國學校，不能再處罰講母語的學生。'},
+      {ago:'34 年前',year:'1992',why:'全班要去外縣市住一晚，外宿得先向派出所申報。',now:'1992 年，外宿遷徙才正式廢除向派出所申報「流動人口」的制度。'}]}
+  },
+  mei:{now:'mei-now.jpg',then:'mei-then.jpg',
+    alt:'戒嚴時期：廣場上的演唱會看板與快閃舞蹈都被打上紅叉；客廳裡女生講電話被監聽，電視只剩「審查中」，桌上放著派出所流動人口登記聯單。',
+    L:{place:'廣場',region:[0,0,57,69],ban:['演唱會的歌詞、服裝都要先審查', '不能未經許可在廣場聚眾跳舞'],clip:'polygon(0 0,100% 0,100% 50%,80% 82%,75% 100%,0 100%)',hot:'left:1%;top:2%;width:52%;height:62%;clip-path:polygon(0 0,100% 0,100% 62%,84% 100%,0 100%)',tag:'left:3%;top:4%',panel:'left:58.5%;top:6%;width:39.5%;--k:.78',
+      items:[
+      {ago:'約 30 年前',year:'1990s',why:'開演唱會前，歌詞、歌手服裝儀容都要先送審，許多歌被列為禁歌。',now:'1990 年代起，逐步廢除歌曲與藝文事前審查後，歌手開演唱會才不用先送審歌詞與服儀。'},
+      {ago:'12 年前',year:'2014',why:'三人以上沒經許可在公共場所聚集跳舞，會被當成非法集會遭驅離。',now:'2014 年大法官作成釋字第 718 號解釋後，臨時起意的街頭快閃與偶發聚眾才無須事先申請許可。'}]},
+    R:{place:'客廳',region:[40,37,60,63],ban:['打電話可能被監聽', '電視只有老三台，第四台是違法的', '出外過夜要向派出所登記流動人口'],hot:'left:46%;top:40%;width:52%;height:57%;clip-path:polygon(12% 0,100% 0,100% 100%,0 100%,0 30%)',tag:'right:3%;bottom:4%',panel:'left:2.5%;top:64%;width:37.5%;--k:.8',banPanel:'left:2.5%;top:70%;width:37.5%;--k:.8',
+      items:[
+      {ago:'34 年前',year:'1992',why:'打電話約朋友可能被監聽；說走就走去外地住，還得先向派出所填流動人口登記。',now:'1992 年廢除《郵電檢查辦法》後，打電話與寄信才不用擔心被秘密監聽與拆閱。'},
+      {ago:'33 年前',year:'1993',why:'電視只有老三台且受黨政軍控制，民間第四台是非法地下頻道。',now:'1993 年制定《有線電視法》後，民間「第四台」才正式合法化、打破老三台壟斷。'}]}
+  },
+  zhiming:{now:'zm-now.jpg',then:'zm-then.jpg',
+    alt:'戒嚴時期：機場的警備總部拿著黑名單攔下兩位男士，畫面被打上紅叉；總統府前拉起鐵絲網與拒馬，士兵持槍站崗。',
+    L:{place:'機場',maskImg:'zm-maskL.png',banSmall:'那些年',
+      ban:['被列入黑名單的人，出不了國也回不了家','出入境要先經過警總安全調查','同性伴侶在法律上形同陌生人'],
+      hot:'left:1%;top:2%;width:50%;height:64%;clip-path:polygon(0 0,100% 0,100% 70%,80% 100%,0 100%)',tag:'left:3%;top:4%',panel:'left:57%;top:6%;width:40%;--k:.8',
+      items:[
+      {ago:'35 年前',year:'1991',why:'出入境要經警總安全調查，有政治紀錄或異議傾向的人會被列入黑名單，禁止出境或返台。',now:'1991 年起取消政治「黑名單」並解除出入境安全調查後，人民出國旅行與返鄉才不再受政治立場限制。'},
+      {ago:'7 年前',year:'2019',lab:'過去',why:'法律只承認一男一女的婚姻，同性伴侶沒有醫療同意權、繼承權與配偶權利。',now:'2019 年起施行《司法院釋字第七四八號解釋施行法》後，同性伴侶才在法律上正式享有結婚與成家的權利。'}]},
+    R:{place:'總統府前',maskImg:'zm-maskR.png',
+      ban:['不能未經許可上街集會、請願','公開批評政府，可能被當成叛亂','不能自由組黨、成立社團'],
+      hot:'left:40%;top:42%;width:58%;height:55%;clip-path:polygon(18% 0,100% 0,100% 100%,0 100%,0 40%)',tag:'right:3%;bottom:4%',panel:'left:2.5%;top:68%;width:34%;--k:.68',banPanel:'left:2.5%;top:72%;width:33.5%;--k:.78',
+      items:[
+      {ago:'37 年前',year:'1989',why:'民間社團與政黨不得自由籌組，未經許可的集會遊行會被當成暴動，出動軍警鎮壓。',now:'1989 年修正《人民團體法》解除黨禁與社團限制後，人民才真正享有自由組黨與成立公民團體的權利。'},
+      {ago:'34 年前',year:'1992',why:'公開批評執政黨或國家元首，可能觸犯《懲治叛亂條例》或《刑法》第 100 條，被判重刑。',now:'1992 年修正《刑法》第 100 條後，和平發表政治評論與批評政府才正式除罪化、不再被當作叛亂罪。'}]}
+  }
+};
+
+const icons={
+  like:'<path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/>',
+  reply:'<path d="M20 11.5a8 8 0 1 1-3.3-6.5A8 8 0 0 1 20 11.5zM6 19l-1.5 2.5 3-1"/>',
+  repost:'<path d="M5 10V8a3 3 0 0 1 3-3h10l-3-3M19 14v2a3 3 0 0 1-3 3H6l3 3"/>',
+  share:'<path d="M21 3 3 10l7 3 3 7z M10 13l11-10"/>'
+};
+const sv=k=>`<svg viewBox="0 0 24 24" aria-hidden="true">${icons[k]}</svg>`;
+const rolesEl=document.getElementById('roles');
+rolesEl.innerHTML=roles.map(r=>`<li class="role">
+  <div class="post" role="radio" tabindex="0" aria-checked="false" data-id="${r.id}" aria-label="選擇角色 ${r.name}">
+    <span class="brand"><img src="threads.png" alt=""></span>
+    <span class="who"><img src="${r.av}" alt=""><b>${r.name}</b><span>1小時</span><span class="more">···</span></span>
+    ${r.post.map(t=>`<p>${t}</p>`).join('')}
+    <span class="stats"><span>${sv('like')}${r.stats[0]}</span><span>${sv('reply')}${r.stats[1]}</span><span>${sv('repost')}${r.stats[2]}</span><span>${sv('share')}${r.stats[3]}</span></span>
+  </div>
+  <ul class="free">${r.free.map(f=>`<li>${f}</li>`).join('')}</ul>
+</li>`).join('');
+
+let picked=null;
+const cross=document.getElementById('cross');
+const posts=[...rolesEl.querySelectorAll('.post')];
+const pick=id=>{
+  picked=id;
+  posts.forEach(p=>p.setAttribute('aria-checked',p.dataset.id===id));
+  rolesEl.classList.toggle('picked',!!id);
+  cross.disabled=!id;
+  const r=roles.find(x=>x.id===id);
+  document.getElementById('goHint').textContent=r?`你選了 @${r.name}，按下穿越鍵出發`:'選擇一個角色後按下穿越鍵，帶你走一趟爭取開放的歷史';
+};
+posts.forEach((p,i)=>{
+  p.addEventListener('click',()=>pick(p.dataset.id));
+  p.addEventListener('keydown',e=>{
+    if(e.key===' '||e.key==='Enter'){e.preventDefault();pick(p.dataset.id);return}
+    const d={ArrowRight:1,ArrowDown:1,ArrowLeft:-1,ArrowUp:-1}[e.key];
+    if(!d)return;e.preventDefault();const n=posts[(i+d+posts.length)%posts.length];n.focus();pick(n.dataset.id);
+  });
+});
+
+const banHtml=s=>`<h2><small>${s.banSmall||'戒嚴時期'}</small>${s.place}｜這些都不行</h2><ul>${s.ban.map(b=>`<li>${b}</li>`).join('')}</ul>`;
+const html=s=>`<h2><small>後來，我們爭取到了</small>${s.place}｜從受罰到自在</h2>`+s.items.map(it=>`<div class="item"><div class="yr${it.year.length>4?' long':''}">${it.year}<small>${it.ago}</small></div><div><p class="why"><b>${it.lab||'戒嚴時期'}</b>　${it.why}</p><p class="now">${it.now}</p></div></div>`).join('');
+const sceneEl=document.getElementById('scene');
+const state={L:false,R:false};
+
+const buildScene=id=>{
+  const r=roles.find(x=>x.id===id);
+  const sc=scenes[id];
+  state.L=state.R=false;
+  const ctrl=`<div class="ctrl"><button type="button" id="back">← 重新選角色</button></div>`;
+  if(!sc){sceneEl.innerHTML=`<div class="wip"><div><b>@${r.name} 的場景製作中</b>先回首頁選其他角色試試看。</div></div>${ctrl}`}
+  else{
+  const geo=k=>{const [l,t,w,h]=sc[k].region;
+    const px=w>=100?0:l/(100-w)*100,py=h>=100?0:t/(100-h)*100;
+    return (sc[k].clip?`clip-path:${sc[k].clip};`:'')+`left:${l}%;top:${t}%;width:${w}%;height:${h}%;background-image:url(${sc.now});background-size:${(1e4/w).toFixed(2)}% ${(1e4/h).toFixed(2)}%;background-position:${px.toFixed(2)}% ${py.toFixed(2)}%`};
+  const side=k=>sc[k].maskImg?`<div class="past full" id="p${k}" style="--m:url(${sc[k].maskImg});background-image:url(${sc.now})"></div>`:`<div class="past" id="p${k}" style="${geo(k)}"></div>`;
+  const hot=k=>`<button class="hot" id="h${k}" data-s="${k}" style="${sc[k].hot}" aria-pressed="false" aria-label="${sc[k].place}：看看後來怎麼改革，再點一次穿越回戒嚴"></button>
+    <span class="tag" id="t${k}" style="${sc[k].tag}"><i></i>點${sc[k].place}，看看後來怎麼改革</span><span class="tag back" style="${sc[k].tag}"><i></i>穿越回戒嚴</span>`;
+  sceneEl.innerHTML=`<div class="stage">
+    <img src="${sc.then}" alt="${sc.alt}">
+    ${side('L')}${side('R')}${hot('L')}${hot('R')}
+    <section class="panel ban" id="xL" style="${sc.L.banPanel||sc.L.panel}">${banHtml(sc.L)}</section>
+    <section class="panel ban" id="xR" style="${sc.R.banPanel||sc.R.panel}">${banHtml(sc.R)}</section>
+    <section class="panel won" id="nL" style="${sc.L.panel}" aria-live="polite">${html(sc.L)}</section>
+    <section class="panel won" id="nR" style="${sc.R.panel}" aria-live="polite">${html(sc.R)}</section>
+  </div>${ctrl}`;
+  const set=(k,on,ev)=>{
+    state[k]=on;const p=document.getElementById('p'+k);
+    if(ev&&on){const b=p.getBoundingClientRect();
+      p.style.setProperty('--x',((ev.clientX-b.left)/b.width*100).toFixed(1)+'%');
+      p.style.setProperty('--y',((ev.clientY-b.top)/b.height*100).toFixed(1)+'%');}
+    p.classList.toggle('on',on);
+    document.getElementById('h'+k).setAttribute('aria-pressed',on);
+    document.getElementById('n'+k).classList.toggle('on',on);
+    document.getElementById('x'+k).classList.toggle('off',on);
+  };
+  sceneEl.querySelectorAll('.hot').forEach(b=>b.addEventListener('click',e=>{const k=b.dataset.s;set(k,!state[k],e.detail?e:null)}));
+  }
+  document.getElementById('back').addEventListener('click',()=>transition(()=>{history.replaceState(null,'',location.pathname+location.search);route()}));
+};
+
+const views={home:document.getElementById('home'),scene:sceneEl};
+const wipe=document.getElementById('wipe');
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const show=v=>{views.home.hidden=v!=='home';views.scene.hidden=v!=='scene'};
+const transition=fn=>{
+  if(reduce){fn();return}
+  wipe.className='wipe in';
+  setTimeout(()=>{fn();wipe.className='wipe out';
+    setTimeout(()=>{wipe.className='wipe reset';},650)},650);
+};
+const route=()=>{
+  const h=location.hash.slice(1);
+  if(roles.some(r=>r.id===h)){pick(h);buildScene(h);show('scene')}
+  else{pick(null);show('home')}
+};
+cross.addEventListener('click',()=>{if(!picked)return;transition(()=>{location.hash=picked})});
+addEventListener('hashchange',route);
+route();
+}
+</script>
+</body>
+</html>
